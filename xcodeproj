@@ -85,3 +85,72 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
+import UIKit
+import AVKit
+import AVFoundation
+
+class VideoPlayerViewController: UIViewController {
+
+    // MARK: - Configuration
+
+    let videoURLString = "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4" // Replace with your actual video URL
+    
+    // MARK: - Properties
+
+    private var playerViewController: AVPlayerViewController?
+
+    // MARK: - Lifecycle
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+        setupCustomVideoButton()
+    }
+
+    // MARK: - UI Setup
+
+    private func setupCustomVideoButton() {
+        let playButton = UIButton(type: .system)
+        playButton.setTitle("Launch Website Video (PiP Enabled)", for: .normal)
+        playButton.titleLabel?.font = UIFont.systemFont(ofSize: 20, weight: .bold)
+        playButton.backgroundColor = .systemBlue
+        playButton.setTitleColor(.white, for: .normal)
+        playButton.layer.cornerRadius = 10
+        playButton.contentEdgeInsets = UIEdgeInsets(top: 15, left: 25, bottom: 15, right: 25)
+        playButton.addTarget(self, action: #selector(playVideoFromWebsite), for: .touchUpInside)
+
+        playButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(playButton)
+
+        NSLayoutConstraint.activate([
+            playButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            playButton.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+    }
+
+    // MARK: - Actions
+
+    @objc private func playVideoFromWebsite() {
+        guard let url = URL(string: videoURLString) else {
+            print("Error: Invalid video URL. Please check the 'videoURLString' variable.")
+            return
+        }
+
+        let player = AVPlayer(url: url)
+        playerViewController = AVPlayerViewController()
+        playerViewController?.player = player
+
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback, options: .allowPictureInPicture)
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("Failed to set audio session category for PiP: \(error.localizedDescription)")
+        }
+
+        if let playerVC = playerViewController {
+            self.present(playerVC, animated: true) {
+                playerVC.player?.play()
+            }
+        }
+    }
+}
