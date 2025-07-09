@@ -2,7 +2,7 @@
 //  MyAppEntrypoint.swift
 //  This file contains the main application structure and the primary view.
 //
-//  Created by DevAssist on 2025.
+//  Created by DevAssist4-2-0 on 2025.
 //
 
 import SwiftUI // Import the SwiftUI framework for building user interfaces.
@@ -11,7 +11,7 @@ import SwiftUI // Import the SwiftUI framework for building user interfaces.
 // This struct defines the entry point of your SwiftUI application.
 // The @main attribute indicates that this is the starting point for your app.
 @main
-struct MyDevAssistApp: App {
+struct DevAssist4-2-0: App {
     // The 'body' property defines the app's scene graph.
     // A WindowGroup is a scene that presents a single window containing your app's content.
     var body: some Scene {
