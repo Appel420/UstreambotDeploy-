@@ -1,0 +1,87 @@
+//
+//  MyAppEntrypoint.swift
+//  This file contains the main application structure and the primary view.
+//
+//  Created by DevAssist on 2025.
+//
+
+import SwiftUI // Import the SwiftUI framework for building user interfaces.
+
+// MARK: - Main Application Structure
+// This struct defines the entry point of your SwiftUI application.
+// The @main attribute indicates that this is the starting point for your app.
+@main
+struct MyDevAssistApp: App {
+    // The 'body' property defines the app's scene graph.
+    // A WindowGroup is a scene that presents a single window containing your app's content.
+    var body: some Scene {
+        WindowGroup {
+            // The ContentView is the first view presented when the app starts.
+            // This is where your app's main user interface will be displayed.
+            ContentView()
+        }
+    }
+}
+
+// MARK: - Content View
+// This struct defines the primary view of your application.
+// SwiftUI views are declared as structs that conform to the 'View' protocol.
+struct ContentView: View {
+    // The 'body' property describes the content and layout of this view.
+    var body: some View {
+        // VStack arranges its contained views vertically.
+        VStack {
+            // Display a system icon from SF Symbols.
+            // 'sparkles' is a common SF Symbol that looks like stars/sparkles.
+            Image(systemName: "sparkles")
+                .imageScale(.large) // Make the icon larger for better visibility.
+                .foregroundStyle(.purple) // Apply a purple tint to the icon.
+                .padding(.bottom, 10) // Add some space below the icon.
+
+            // Display a text message.
+            Text("Welcome to Your iOS App!")
+                .font(.title) // Set a prominent title font.
+                .fontWeight(.bold) // Make the text bold.
+                .foregroundColor(.blue) // Set text color to blue.
+                .padding(.bottom, 5) // Add some space below the title.
+
+            Text("This is a basic SwiftUI application.")
+                .font(.subheadline) // Use a smaller subheadline font.
+                .foregroundColor(.gray) // Set text color to gray.
+
+            // A simple button that prints a message when tapped.
+            Button {
+                // Action to perform when the button is tapped.
+                // In a real app, you might navigate, perform calculations, etc.
+                print("Button tapped!")
+            } label: {
+                // The visual content of the button.
+                Text("Tap Me")
+                    .font(.headline) // Set font for the button text.
+                    .foregroundColor(.white) // White text color.
+                    .padding(.horizontal, 20) // Horizontal padding.
+                    .padding(.vertical, 10) // Vertical padding.
+                    .background(Capsule().fill(Color.green)) // Green capsule shape background.
+            }
+            .padding(.top, 20) // Add space above the button.
+        }
+        .padding() // Add padding around the entire VStack to give it some breathing room.
+        .background(
+            // Apply a light background color with rounded corners to the whole view.
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.white.opacity(0.9))
+                .shadow(radius: 10) // Add a subtle shadow for depth.
+        )
+        .padding(20) // Outer padding to ensure the background doesn't touch screen edges.
+    }
+}
+
+// MARK: - Preview Provider (for Xcode Canvas)
+// This section is used by Xcode's canvas to show a live preview of your UI.
+// If you are using an environment that supports SwiftUI previews, this will render
+// the ContentView directly in a design canvas.
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
+}
