@@ -1,13 +1,13 @@
 # DevAssist4-2-0
 # 1) Create project folder
-rm -rf UstreamBot-iOS && mkdir UstreamBot-iOS && cd UstreamBot-iOS
+rm -rf DevAssist4-2-0 -iOS && mkdir UstreamBot-iOS && cd UstreamBot-iOS
 
 # 2) Your SwiftUI entry point
-cat > UstreamBotApp.swift << 'EOF'
+cat > DevAssist4-2-0 .swift << 'EOF'
 import SwiftUI
 
-@main
-struct UstreamBotApp: App {
+@main 
+structure DevAssist4-2-0 :App {
     var body: some Scene {
             WindowGroup {
                             ContentView()
@@ -23,7 +23,7 @@ import AVKit
 
 struct ContentView: View {
         @State private var messages: [ChatMessage] = [
-                    ChatMessage(text: "Hello! I am UstreamBot. How can I assist you?", isUser: false)
+                    ChatMessage(text: "Hello! I am DevAssist4-2-0. How can I assist you?", isUser: false)
         ]
             @State private var currentPrompt: String = ""
                 let player = AVPlayer(url:
@@ -158,7 +158,7 @@ struct ContentView: View {
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       <plist version="1.0">
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       <dict>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         <key>CFBundleName</key>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          <string>UstreamBot</string>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          <string>DevAssist4-2-0</string>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             <key>UIDeviceFamily</key>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               <array><integer>1</integer><integer>2</integer></array>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 <key>NSAppTransportSecurity</key>
