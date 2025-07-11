@@ -147,7 +147,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 For support and questions:
 - Create an issue in this repository
-- Contact: support@devassist.com
+- Contact: support appel420@ustream4free.com
 
 ---
 
