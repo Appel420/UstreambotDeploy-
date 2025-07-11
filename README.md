@@ -1,186 +1,154 @@
-# DevAssist4-2-0
-# 1) Create project folder
-rm -rf DevAssist4-2-0 -iOS && mkdir UstreamBot-iOS && cd UstreamBot-iOS
+# DevAssist 4.2.0 - Professional iOS Development Assistant
 
-# 2) Your SwiftUI entry point
-cat > DevAssist4-2-0 .swift << 'EOF'
-import SwiftUI
+A secure, production-ready iOS application that combines video streaming with AI-powered chat functionality, built following Apple and Google guidelines.
 
-@main 
-structure DevAssist4-2-0 :App {
-    var body: some Scene {
-            WindowGroup {
-                            ContentView()
-            }
-    }
-}
-EOF
+## 🔒 Security Features
 
-# 3) Your ContentView (video + chat)
-cat > ContentView.swift << 'EOF'
-import SwiftUI
-import AVKit
+- **Keychain Integration**: Secure storage of API keys and OAuth tokens
+- **Input Sanitization**: All user inputs are validated and sanitized
+- **HTTPS Only**: All network communications use HTTPS
+- **Rate Limiting**: Backend API includes rate limiting protection
+- **Data Encryption**: Sensitive data is encrypted at rest and in transit
 
-struct ContentView: View {
-        @State private var messages: [ChatMessage] = [
-                    ChatMessage(text: "Hello! I am DevAssist4-2-0. How can I assist you?", isUser: false)
-        ]
-            @State private var currentPrompt: String = ""
-                let player = AVPlayer(url:
-                      URL(string:
-                              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-                )!
-                    )
-                    
-                        var body: some View {
-                                    NavigationView {
-                                                    VStack {
-                                                                        VideoPlayer(player: player)
-                                                                                            .frame(height: 220)
-                                                                                                                .onAppear {
-                                                                                                                                            try? AVAudioSession.sharedInstance()
-                                                                                                                                                                      .setCategory(.playback, mode: .moviePlayback)
-                                                                                                                }
-                                                                                                                                chatSection
-                                                    }
-                                                                .navigationTitle("UstreamBot")
-                                                                            .navigationBarTitleDisplayMode(.inline)
-                                    }
-                        }
+## 🏗️ Architecture
 
-                            private var chatSection: some View {
-                                        VStack {
-                                                        ScrollView {
-                                                                            VStack(alignment: .leading, spacing: 12) {
-                                                                                                    ForEach(messages) { msg in
-                                                                                                                            MessageView(message: msg)
-                                                                                                    }
-                                                                            }
-                                                                                            .padding()
-                                                        }
-                                                                    HStack {
-                                                                                        TextField("Ask UstreamBot...", text: $currentPrompt)
-                                                                                                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                                                                                                                                .padding(.leading)
-                                                                                                                                                Button(action: sendMessage) {
-                                                                                                                                                                        Image(systemName: "arrow.up.circle.fill")
-                                                                                                                                                                                                .font(.title)
-                                                                                                                                                }
-                                                                                                                                                                .padding(.trailing)
-                                                                                                                                                                                .disabled(currentPrompt.isEmpty)
-                                                                                                                                                                                            }
-                                                                                                                                                                                                        .padding(.bottom, 8)
-                                        }
-                            }
+### iOS App (Swift/SwiftUI)
+- **MVVM Architecture**: Clean separation of concerns
+- **Combine Framework**: Reactive programming for data flow
+- **Secure Networking**: URLSession with proper error handling
+- **Keychain Services**: Secure credential storage
+- **Network Monitoring**: Real-time connectivity status
 
-                                private func sendMessage() {
-                                            guard !currentPrompt.isEmpty else { return }
-                                                    let prompt = currentPrompt
-                                                            messages.append(.init(text: prompt, isUser: true))
-                                                                    currentPrompt = ""
-                                                                            APIClient.sendMessage(prompt: prompt) { result in
-                                                                                        DispatchQueue.main.async {
-                                                                                                        switch result {
-                                                                                                                        case .success(let reply):
-                                                                                                                                            messages.append(.init(text: reply, isUser: false))
-                                                                                                                                                            case .failure:
-                                                                                                                                                                                messages.append(.init(text: "❌ Error contacting backend", isUser: false))
-                                                                                                                                                                                                }
-                                                                                                                                                                                                            }
-                                                                                                                                                                                                                    }
-                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                        
-                                                                                                                                                                                                                        struct ChatMessage: Identifiable {
-                                                                                                                                                                                                                            let id = UUID(), text: String, isUser: Bool
-                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                            
-                                                                                                                                                                                                                            struct MessageView: View {
-                                                                                                                                                                                                                                let message: ChatMessage
-                                                                                                                                                                                                                                    var body: some View {
-                                                                                                                                                                                                                                            HStack {
-                                                                                                                                                                                                                                                        if message.isUser {
-                                                                                                                                                                                                                                                                        Spacer()
-                                                                                                                                                                                                                                                                                        Text(message.text)
-                                                                                                                                                                                                                                                                                                          .padding(12)
-                                                                                                                                                                                                                                                                                                                            .background(Color.blue)
-                                                                                                                                                                                                                                                                                                                                              .foregroundColor(.white)
-                                                                                                                                                                                                                                                                                                                                                                .cornerRadius(15)
-                                                                                                                                                                                                                                                                                                                                                                            } else {
-                                                                                                                                                                                                                                                                                                                                                                                            Text(message.text)
-                                                                                                                                                                                                                                                                                                                                                                                                              .padding(12)
-                                                                                                                                                                                                                                                                                                                                                                                                                                .background(Color(UIColor.systemGray5))
-                                                                                                                                                                                                                                                                                                                                                                                                                                                  .cornerRadius(15)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                  Spacer()
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                              }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          EOF
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          # 4) API client pointing at your live Flask endpoint
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          cat > APIClient.swift << 'EOF'
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          import Foundation
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          struct APIClient {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              static func sendMessage(prompt: String,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          completion: @escaping (Result<String, Error>) -> Void) {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  guard let url = URL(string: "https://YOUR_BACKEND_URL/chat") else {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              completion(.failure(NSError(domain:"Invalid URL", code:0)))
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          return
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          var req = URLRequest(url: url)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  req.httpMethod = "POST"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          req.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  req.httpBody = try? JSONSerialization
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            .data(withJSONObject: ["prompt":prompt], options: [])
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    URLSession.shared.dataTask(with: req) { data, _, err in
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                if let e = err { return completion(.failure(e)) }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            guard let d = data,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              let json = try? JSONSerialization
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  .jsonObject(with:d) as? [String:String],
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    let resp = json["response"]
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                else {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                return completion(.failure(NSError(domain:"Bad response", code:1)))
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        completion(.success(resp))
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }.resume()
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    EOF
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    # 5) Info.plist with PiP & network permissions
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    cat > Info.plist << 'EOF'
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <?xml version="1.0" encoding="UTF-8"?>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      <plist version="1.0">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      <dict>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <key>CFBundleName</key>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          <string>DevAssist4-2-0</string>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <key>UIDeviceFamily</key>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              <array><integer>1</integer><integer>2</integer></array>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <key>NSAppTransportSecurity</key>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  <dict>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      <key>NSAllowsArbitraryLoads</key><true/>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </dict>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          <key>NSCameraUsageDescription</key>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <string>Needed for future camera features</string>Scinc<esiretairat )tErrAFd_t.lata bret piu a —ikt- .
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            o is0  tiSermz}
-                                }
-                                                                                                                                                }
-                                                                    }}
-                                                                            }
-                                                        }
-                                        }
-                            }
-                                                                                                                }
-                                                    }
-                                    }
-                        }))
-        ]
-}>>
-            }
-    <!-- Trigger build for TestFlight -->Trigger build Sun Jul  6 09:09:51 AM UTC 2025
-Trigger build (auth test) Sun Jul  6 09:(28:38 AM UTC 2025
+### Backend API (Node.js/Express)
+- **Security Middleware**: Helmet, CORS, rate limiting
+- **Input Validation**: Express-validator for request sanitization
+- **Structured Logging**: Winston for comprehensive logging
+- **Error Handling**: Proper error responses and logging
+
+## 📱 Features
+
+- **Video Streaming**: AVKit integration with proper audio session management
+- **AI Chat Interface**: Secure chat with backend API
+- **Real-time Status**: Network and API health monitoring
+- **Settings Management**: Secure configuration and privacy controls
+- **Privacy Compliance**: Full privacy policy and data protection
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Xcode 15.0+
+- iOS 15.0+
+- Node.js 18.0+
+- Google Cloud account (for backend deployment)
+
+### iOS Setup
+1. Open `DevAssist4-2-0.xcodeproj` in Xcode
+2. Configure your development team in project settings
+3. Update API endpoints in `Configuration.swift`
+4. Build and run on simulator or device
+
+### Backend Setup
+1. Navigate to `backend/` directory
+2. Install dependencies: `npm install`
+3. Set environment variables:
+   \`\`\`bash
+   export NODE_ENV=development
+   export ALLOWED_ORIGINS=http://localhost:3000
+   \`\`\`
+4. Start development server: `npm run dev`
+
+### Deployment
+1. **iOS**: Use Xcode's archive and upload to App Store Connect
+2. **Backend**: Deploy to Google Cloud Functions using GitHub Actions
+
+## 🔐 Security Configuration
+
+### API Keys
+- Store API keys securely in iOS Keychain
+- Never commit API keys to version control
+- Use environment variables for backend configuration
+
+### OAuth Tokens
+- Implement proper OAuth 2.0 flow
+- Store tokens securely in Keychain
+- Implement token refresh logic
+
+### Network Security
+- All API calls use HTTPS
+- Certificate pinning for production
+- Proper error handling without exposing sensitive data
+
+## 📊 Monitoring & Analytics
+
+### Logging
+- Structured logging with Winston (backend)
+- os_log for iOS (Apple compliant)
+- No sensitive data in logs
+
+### Error Tracking
+- Comprehensive error handling
+- User-friendly error messages
+- Detailed logging for debugging
+
+## 🧪 Testing
+
+### iOS Testing
+\`\`\`bash
+xcodebuild test \
+  -project DevAssist4-2-0.xcodeproj \
+  -scheme DevAssist4-2-0 \
+  -destination 'platform=iOS Simulator,name=iPhone 15 Pro'
+\`\`\`
+
+### Backend Testing
+\`\`\`bash
+cd backend
+npm test
+npm run security-audit
+\`\`\`
+
+## 📋 Compliance
+
+### Apple App Store Guidelines
+- ✅ Privacy policy implemented
+- ✅ Secure data handling
+- ✅ Proper permission requests
+- ✅ No hardcoded credentials
+- ✅ Accessibility support
+
+### Google Cloud Platform
+- ✅ Secure API endpoints
+- ✅ Rate limiting implemented
+- ✅ Proper error handling
+- ✅ Structured logging
+- ✅ Security headers
+
+## 🔄 CI/CD Pipeline
+
+GitHub Actions workflow includes:
+- Security scanning
+- Automated testing
+- Build verification
+- Deployment to production
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
+
+## 📞 Support
+
+For support and questions:
+- Create an issue in this repository
+- Contact: support appel420@ustream4free.com
+
+---
+
+**Note**: This application follows all Apple App Store and Google Cloud Platform guidelines for security, privacy, and best practices.
