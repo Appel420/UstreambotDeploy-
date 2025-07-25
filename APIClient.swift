@@ -1,19 +1,8 @@
 import Foundation
 
-struct ChatRequest: Codable {
-    let prompt: String
-}
-
-struct ChatResponse: Codable {
-    let response: String
-    let timestamp: String?
-}
-
-class APIClient {
-    // Update this URL with your actual backend endpoint
-    // For Google Cloud Functions: https://YOUR_REGION-YOUR_PROJECT.cloudfunctions.net/chatbot/chat
-    // For local development: http://localhost:8080/chat
-    private static let baseURL = "https://us-central1-your-project.cloudfunctions.net/chatbot"
+struct APIClient {
+    // Replace with your actual backend URL
+    private static let baseURL = "https://your-backend-url.com"
     
     static func sendMessage(prompt: String, completion: @escaping (Result<String, Error>) -> Void) {
         guard let url = URL(string: "\(baseURL)/chat") else {
@@ -26,10 +15,10 @@ class APIClient {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.timeoutInterval = 30.0
         
-        let chatRequest = ChatRequest(prompt: prompt)
+        let requestBody = ["prompt": prompt]
         
         do {
-            let jsonData = try JSONEncoder().encode(chatRequest)
+            let jsonData = try JSONSerialization.data(withJSONObject: requestBody)
             request.httpBody = jsonData
         } catch {
             completion(.failure(error))
@@ -49,8 +38,7 @@ class APIClient {
                 }
                 
                 guard httpResponse.statusCode == 200 else {
-                    let errorMessage = String(data: data ?? Data(), encoding: .utf8) ?? "Unknown error"
-                    completion(.failure(APIError.serverError(httpResponse.statusCode, errorMessage)))
+                    completion(.failure(APIError.serverError(httpResponse.statusCode)))
                     return
                 }
                 
@@ -60,8 +48,12 @@ class APIClient {
                 }
                 
                 do {
-                    let chatResponse = try JSONDecoder().decode(ChatResponse.self, from: data)
-                    completion(.success(chatResponse.response))
+                    if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                       let response = json["response"] as? String {
+                        completion(.success(response))
+                    } else {
+                        completion(.failure(APIError.invalidResponseFormat))
+                    }
                 } catch {
                     completion(.failure(error))
                 }
@@ -69,26 +61,26 @@ class APIClient {
         }.resume()
     }
     
+    // Health check endpoint
     static func healthCheck(completion: @escaping (Result<Bool, Error>) -> Void) {
         guard let url = URL(string: "\(baseURL)/health") else {
             completion(.failure(APIError.invalidURL))
             return
         }
         
-        URLSession.shared.dataTask(with: URLRequest(url: url)) { data, response, error in
+        URLSession.shared.dataTask(with: URLRequest(url: url)) { _, response, error in
             DispatchQueue.main.async {
                 if let error = error {
                     completion(.failure(error))
                     return
                 }
                 
-                guard let httpResponse = response as? HTTPURLResponse,
-                      httpResponse.statusCode == 200 else {
+                if let httpResponse = response as? HTTPURLResponse,
+                   httpResponse.statusCode == 200 {
+                    completion(.success(true))
+                } else {
                     completion(.failure(APIError.serverUnavailable))
-                    return
                 }
-                
-                completion(.success(true))
             }
         }.resume()
     }
@@ -98,8 +90,9 @@ enum APIError: LocalizedError {
     case invalidURL
     case invalidResponse
     case noData
-    case serverError(Int, String)
+    case serverError(Int)
     case serverUnavailable
+    case invalidResponseFormat
     
     var errorDescription: String? {
         switch self {
@@ -108,11 +101,13 @@ enum APIError: LocalizedError {
         case .invalidResponse:
             return "Invalid server response"
         case .noData:
-            return "No data received from server"
-        case .serverError(let code, let message):
-            return "Server error (\(code)): \(message)"
+            return "No data received"
+        case .serverError(let code):
+            return "Server error (Code: \(code))"
         case .serverUnavailable:
-            return "Server is currently unavailable"
+            return "Server unavailable"
+        case .invalidResponseFormat:
+            return "Invalid response format"
         }
     }
 }

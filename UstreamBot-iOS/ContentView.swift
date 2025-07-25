@@ -1,4 +1,3 @@
-
 import SwiftUI
 
 import AVKit
@@ -194,4 +193,3 @@ struct MessageView: View {
     }
 
 }
-
