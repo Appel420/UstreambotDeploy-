@@ -152,3 +152,4 @@ For support and questions:
 ---
 
 **Note**: This application follows all Apple App Store and Google Cloud Platform guidelines for security, privacy, and best practices.
+
